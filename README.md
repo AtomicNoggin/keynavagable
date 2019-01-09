@@ -36,4 +36,4 @@ Value can either be an Element or a string reperesnting the id of an element. Wi
 
 ### Element.protoype.releaseeKeyAction(key)
 #### Arguments:
-**key**: the key press, or key press combination, to stop listening for on befalf of this elements children 
+**key**: the key press, or key press combination, to stop listening for on behalf of this elements children 
