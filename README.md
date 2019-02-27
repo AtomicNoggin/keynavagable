@@ -32,7 +32,7 @@ Set the element to focus on when shift-tab is pressed.
 Value can either be an Element or a string representing the id of an Element. Will also read the id value set in a `tab-previous` attribute.
 
 ## Methods
-### Element.protoype.setKeyAction(key,method[,target])
+### Element.prototype.setKeyAction(key,method[,target])
 #### Arguments:
 **key**: the key press or key press combination to listen for while this element has focus. Maps to the KeyboardEvent key value (with the exception of ' ', which becomes 'Space').
    If modifier keys are required, those should added prior to the key (e.g. `Shift UpArrow` or `Alt Control PageDown`) in alphabetical order
@@ -44,11 +44,11 @@ Value can either be an Element or a string representing the id of an Element. Wi
 
 **target**: the Element to bind to the method. Defaults to the current Element if omitted.
 
-### Element.protoype.removeKeyAction(key)
+### Element.prototype.removeKeyAction(key)
 #### Arguments:
 **key**: the key press or key press combination to stop listening for.
 
-### Element.protoype.captureKeyAction(key,method[,target])
+### Element.prototype.captureKeyAction(key,method[,target])
 #### Arguments:
 **key**: the key press or key press combination to listen for while children of this element has focus.
 
@@ -56,6 +56,6 @@ Value can either be an Element or a string representing the id of an Element. Wi
 
 **target**: the Element to bind to the method. Defaults to the current Element if omitted.
 
-### Element.protoype.releaseKeyAction(key)
+### Element.prototype.releaseKeyAction(key)
 #### Arguments:
 **key**: the key press or key press combination to stop listening for on behalf of this elements children

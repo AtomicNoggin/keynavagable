@@ -124,11 +124,9 @@
           (e.ctrlKey && key !== 'Control'? 'Control ' : '') +
           (e.keyMeta && key !== 'Meta'? 'Meta ' : '') +
           (e.shiftKey && key.length > 1 && key !== 'Shift' ? 'Shift ' : '') + key;
-    console.log(key);
     if (myEvents && myEvents[key] ) {
       if (activeElement.dispatchEvent(getKeynavEvent())) {
         e.preventDefault();
-        console.log(myEvents[key]);
         myEvents[key]();
       }
     }
@@ -138,7 +136,7 @@
       e.preventDefault();
     }
     //tab-previous set and behaviour not overriden with custom keyAction
-    else if (key == 'Shift-Tab' && (activeElement = activeElement.tabPrevious)) {
+    else if (key == 'Shift Tab' && (activeElement = activeElement.tabPrevious)) {
       activeElement.focus();
       e.preventDefault();
     }
@@ -150,7 +148,6 @@
       if (captureElement) {
         if (captureElement.dispatchEvent(getKeynavEvent())) {
           e.preventDefault();
-          console.log(myEvents[key]);
           myEvents[key]();
         }
       }
