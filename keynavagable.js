@@ -5,30 +5,31 @@
   var tabElements = new WeakMap();
   var captureKeys = {};
   var ep = Element.prototype;
+  var next = 'next',tabnext = 'tab-next',prev = 'prev',tabprev = 'tab-previous';
   Object.defineProperties(ep, {
     'tabNext':{
       get: function() {
         var tabs = tabElements.get(this);
-        if (tabs && tabs['next']) {
-          return tabs['next'];
+        if (tabs && tabs[next]) {
+          return tabs[next];
         }
         else {
-          return document.getElementById(this.getAttribute('tab-next'));
+          return document.getElementById(this.getAttribute(tabnext));
         }
       },
       set:function (value) {
         var tabs = tabElements.get(this) || {};
         if (value instanceof Element) {
-          tabs['next'] = value;
-          this.removeAttribute('tab-next');
+          tabs[next] = value;
+          this.removeAttribute(tabnext);
         }
         else if (value=== String(value) && value.length) {
-          tabs['next'] = null;
-          this.setAttribute('tab-next',value);
+          tabs[next] = null;
+          this.setAttribute(tabnext,value);
         }
         else {
-          tabs['next'] = null;
-          this.removeAttribute('tab-next');
+          tabs[next] = null;
+          this.removeAttribute(tabnext);
         }
         tabElements.set(this,tabs);
       },
@@ -38,26 +39,26 @@
     'tabPrevious':{
       get: function() {
         var tabs = tabElements.get(this);
-        if (tabs && tabs['prev']) {
-          return tabs['prev'];
+        if (tabs && tabs[prev]) {
+          return tabs[prev];
         }
         else {
-          return document.getElementById(this.getAttribute('tab-previous'));
+          return document.getElementById(this.getAttribute(tabprev));
         }
       },
       set:function (value) {
         var tabs = tabElements.get(this) || {};
         if (value instanceof Element) {
-          tabs['previous'] = value;
-          this.removeAttribute('tab-previous');
+          tabs[prev] = value;
+          this.removeAttribute(tabprev);
         }
         else if (value=== String(value) && value.length) {
-          tabs['previous'] = null;
-          this.setAttribute('tab-previous',value);
+          tabs[prev] = null;
+          this.setAttribute(tabprev,value);
         }
         else {
-          tabs['previous'] = null;
-          this.removeAttribute('tab-previous');
+          tabs[prev] = null;
+          this.removeAttribute(tabprev);
         }
         tabElements.set(this, tabs);
       },
@@ -77,8 +78,6 @@
         method = function() {};
       }
       if (method) {
-        console.log('setting keyaction '+key+' for element');
-        console.log(element);
         myEvents[key] = method.bind(element);
         events.set(this,myEvents);
       }
@@ -119,12 +118,12 @@
         activeElement = document.activeElement,
         myEvents = events.get(activeElement),
         captureElement = activeElement;
-    //if in content editable mode, ignore this
+    //if in content editable mode, ignore
     if (activeElement.isContentEditable) return;
-    key = (e.altKey && key !== 'Alt' ? 'Alt-' : '') +
-          (e.ctrlKey && key !== 'Control'? 'Control-' : '') +
-          (e.keyMeta && key !== 'Meta'? 'Meta-' : '') +
-          (e.shiftKey && key.length > 1 && key !== 'Shift' ? 'Shift-' : '') + key;
+    key = (e.altKey && key !== 'Alt' ? 'Alt ' : '') +
+          (e.ctrlKey && key !== 'Control'? 'Control ' : '') +
+          (e.keyMeta && key !== 'Meta'? 'Meta ' : '') +
+          (e.shiftKey && key.length > 1 && key !== 'Shift' ? 'Shift ' : '') + key;
     console.log(key);
     if (myEvents && myEvents[key] ) {
       if (activeElement.dispatchEvent(getKeynavEvent())) {
