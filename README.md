@@ -4,7 +4,7 @@ custom key navigation events to be set on focusable Elements, or capture
 key navigation events of child focusable Elements.
 
 ## Usage
-```
+```js
 // assumes list Elements are focusable (e.g. tabindex="-1")
 var listItems = document.querySelectorAll('[role="list"] > [role="listitem"]');
 [].forEach.call(listItems, function(item) {
