@@ -7,21 +7,42 @@ key navigation events of child focusable Elements.
 ## Usage
 
 ```js
-// assumes list Elements are focusable (e.g. tabindex="-1")
-let listItems = document.querySelectorAll('[role="list"] > [role="listitem"]');
-[].forEach.call(listItems, function(item) {
-  // set focus to appropriate sibling with arrow keys
-  item.setKeyAction('ArrowDown',function() { item.nextElementSibling.focus() });
-  item.setKeyAction('ArrowUp',function() { item.previousElementSibling.focus() });
+// assumes tab Elements are focusable (e.g. tabindex="-1")
+let tabs = document.querySelectorAll('[role="tablist"] > [role="tab"]');
+[].forEach.call(tabs, function(tab) {
+  // set focus to appropriate sibling with arrow keys (assumes an onfocus event listener)
+  tab.setKeyAction("ArrowRight", function() {
+    tab.nextElementSibling.focus();
+  });
+  tab.setKeyAction("ArrowLeft", function() {
+    tab.previousElementSibling.focus();
+  });
+  //tab key takes you to the appropriate panel
+  tab.tabNext(tab.getAttribute("aria-controls"));
 });
 
-// list does not need to be focusable to capture a key action
-let lists = document.querySelectorAll('[role="list"]');
+// tablist does not need to be focusable to capture a key action
+let lists = document.querySelectorAll('[role="tablist"]');
 [].forEach.call(lists, function(list) {
   // if child element has focus move to top or bottom of list on Home/End
-  list.captureKeyAction('Home',function() { list.firstElementChild.focus(); });
-  list.captureKeyAction('End',function() { list.lastElementChild.focus(); });
-}
+  list.captureKeyAction("Home", function() {
+    list.firstElementChild.focus();
+  });
+  list.captureKeyAction("End", function() {
+    list.lastElementChild.focus();
+  });
+});
+
+//tabpanel should be focusable
+let panels = document.querySelectorAll('[role="tabpanel"]');
+[].forEach.call(panels, function(panel) {
+  //Shift up arrow anywhere within the tab panel brings you to the tab element
+  panel.captureKeyAction("Shift ArrowUp", function() {
+    document.getElementById(panel.getAttribute("aria-labelledby")).focus();
+  });
+  //shift-tab when the panel has focus also takes you back to the tab element
+  panel.tabPrevious(panel.getAttribute("aria-labelledby"));
+});
 ```
 
 ## Properties
@@ -43,7 +64,7 @@ Value can either be an Element or a string representing the id of an Element. Wi
 #### Arguments:
 
 **key**: the key press or key press combination to listen for while this element has focus. Maps to the KeyboardEvent key value (with the exception of ' ', which becomes 'Space').
-If modifier keys are required, those should added prior to the key (e.g. `Shift UpArrow` or `Alt Control PageDown`) in alphabetical order
+If modifier keys are required, those should added prior to the key (e.g. `Shift ArrowUp` or `Alt Control PageDown`) in alphabetical order
 
 _Note_: for alpha-numeric keys, Shift does not need to be provided, as the key value will already detail this
 (e.g. `Shift w` will not work, but `W` will)
