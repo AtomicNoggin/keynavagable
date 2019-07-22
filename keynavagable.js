@@ -155,10 +155,15 @@
         activeElement.focus();
         e.preventDefault();
       } else if (captureKeys[key]) {
-        do {
-          captureElement = captureElement.parentElement;
-          myEvents = captures.get(captureElement);
-        } while (captureElement && (!myEvents || !myEvents[key]));
+        //is the active Element is trying to capture this key
+        myEvents = captures.get(captureElement);
+        if (!myEvents || !myEvents[key]) {
+          //if not, try to find an ancestor this is
+          do {
+            captureElement = captureElement.parentElement;
+            myEvents = captures.get(captureElement);
+          } while (captureElement && (!myEvents || !myEvents[key]));
+        }
         if (captureElement && captureElement.dispatchEvent(getKeynavEvent())) {
           e.preventDefault();
           myEvents[key]();
