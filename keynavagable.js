@@ -63,6 +63,12 @@
       configurable: true
     }
   });
+  ep.hasKeyAction = function hasKeyAction(key) {
+    return !!(events.get(this) || {})[key];
+  };
+  ep.getKeyAction = function getKeyAction(key) {
+    return (events.get(this) || {})[key];
+  };
   ep.setKeyAction = function setKeyAction(key, method, element) {
     var myEvents = events.get(this) || {};
     element = element instanceof Element ? element : this;
@@ -91,6 +97,12 @@
         ? events.set(this, myEvents)
         : events.delete(this);
     }
+  };
+  ep.hasCaptureKeyAction = function hasCaptureKeyAction(key) {
+    return !!(captures.get(this) || {})[key];
+  };
+  ep.getCaptureKeyAction = function getCaptureKeyAction(key) {
+    return (captures.get(this) || {})[key];
   };
   ep.captureKeyAction = function captureKeyAction(key, method, element) {
     var myCaptures = captures.get(this) || {};

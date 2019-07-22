@@ -61,6 +61,8 @@ Value can either be an Element or a string representing the id of an Element. Wi
 
 ### Element.prototype.setKeyAction(key,method[,target])
 
+Associate a key press or key press combination to a function for a given Element
+
 #### Arguments:
 
 **key**: the key press or key press combination to listen for while this element has focus. Maps to the KeyboardEvent key value (with the exception of ' ', which becomes 'Space').
@@ -71,19 +73,45 @@ _Note_: for alpha-numeric keys, Shift does not need to be provided, as the key v
 
 **method**: the function to fire when this key combination is pressed. Can be an actual function, or a string that represents the name of the Element's method to fire.
 
-**target**: the Element to bind to the method. Defaults to the current Element if omitted.
+**target**: the Element to bind the method to. Defaults to the current Element if omitted.
 
 ### Element.prototype.removeKeyAction(key)
+
+Stop associating a key press or key press combination to an Element
 
 #### Arguments:
 
 **key**: the key press or key press combination to stop listening for.
 
-### Element.prototype.captureKeyAction(key,method[,target])
+### Element.prototype.getKeyAction(key)
+
+return an Element's associated function, if any, based on the given key press or key press combination
 
 #### Arguments:
 
-**key**: the key press or key press combination to listen for while children of this element has focus.
+**key**: the key press or key press combination associated to the desired function.
+
+**returns**: `Function` The associated function or `undefined` if no function exists.
+
+_Note_: The function provided will be bound to target Element of the original setKeyAction call.
+
+### Element.prototype.hasKeyAction(key)
+
+check if an Element has an associated function, if any, based on the given key press or key press combination
+
+#### Arguments:
+
+**key**: the key press or key press combination associated to the desired function.
+
+**returns**: `Boolean`
+
+### Element.prototype.captureKeyAction(key,method[,target])
+
+Associate a key press or key press combination to a function for a given Element or any of it's children
+
+#### Arguments:
+
+**key**: the key press or key press combination to listen for while this Element or one of it's children has focus.
 
 **method**: the function to fire when this key combination is pressed. Can be an actual function, or a string that represents the name of the Element's method to fire.
 
@@ -91,6 +119,30 @@ _Note_: for alpha-numeric keys, Shift does not need to be provided, as the key v
 
 ### Element.prototype.releaseKeyAction(key)
 
+Stop associating a key press or key press combination to a given Element or any of it's children.
+
 #### Arguments:
 
 **key**: the key press or key press combination to stop listening for on behalf of this elements children
+
+### Element.prototype.getCaptureKeyAction(key)
+
+Return an Element's associated capture function, if any, based on the given key press or key press combination
+
+#### Arguments:
+
+**key**: the key press or key press combination associated to the desired function.
+
+**returns**: `Function` The associated function or `undefined` if no function exists.
+
+_Note_: The function provided will be bound to target Element of the original capturedKeyAction call.
+
+### Element.prototype.hasCaptureKeyAction(key)
+
+check if an Element has an associated capture function, if any, based on the given key press or key press combination
+
+#### Arguments:
+
+**key**: the key press or key press combination associated to the desired function.
+
+**returns**: `Boolean`
