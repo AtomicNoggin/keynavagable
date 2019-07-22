@@ -1,16 +1,16 @@
 # keynavagable
 
 Lightweight keyboard navigation manager. Extends the Element object to allow
-custom key navigation events to be set on focusable Elements, or capture
-key navigation events of child focusable Elements.
+custom key navigation events to be set on focusable elements, or capture
+key navigation events of child focusable elements.
 
 ## Usage
 
 ```js
-// assumes tab Elements are focusable (e.g. tabindex="-1")
+// assumes aria tab elements are focusable (e.g. tabindex="-1")
 let tabs = document.querySelectorAll('[role="tablist"] > [role="tab"]');
 [].forEach.call(tabs, function(tab) {
-  // set focus to appropriate sibling with arrow keys (assumes an onfocus event listener)
+  // set focus to appropriate sibling with arrow keys (assumes a focus event listener does the real work)
   tab.setKeyAction("ArrowRight", function() {
     tab.nextElementSibling.focus();
   });
@@ -50,18 +50,18 @@ let panels = document.querySelectorAll('[role="tabpanel"]');
 ### Element.prototype.tabNext
 
 Set the element to move focus to when the `Tab` key is pressed.
-Value can either be an Element or a string representing the id of an Element. Will alternately read the id value set in a `tab-next` attribute.
+Value can either be an element or a string representing the id of an element. Will alternately read the id value set in a `tab-next` attribute.
 
 ### Element.prototype.tabPrevious
 
 Set the element to move focus to when the `Shift Tab` keys are pressed.
-Value can either be an Element or a string representing the id of an Element. Will alternately read the id value set in a `tab-previous` attribute.
+Value can either be an element or a string representing the id of an element. Will alternately read the id value set in a `tab-previous` attribute.
 
 ## Methods
 
 ### Element.prototype.setKeyAction(key,method[,target])
 
-Associate a key press or key press combination to a function for a given Element
+Associate a key press or key press combination to a function for a given element.
 
 #### Arguments:
 
@@ -76,7 +76,7 @@ _Note_: for alpha-numeric keys, Shift does not need to be provided, as the key v
 
 ### Element.prototype.removeKeyAction(key)
 
-Stop associating a key press or key press combination to an Element
+Stop associating a key press or key press combination to an element
 
 #### Arguments:
 
@@ -84,43 +84,51 @@ Stop associating a key press or key press combination to an Element
 
 ### Element.prototype.getKeyAction(key)
 
-return an Element's associated function, if any, based on the given key press or key press combination
+return an element's associated function, if any, based on the given key press or key press combination
 
 #### Arguments:
 
 **key**: the key press or key press combination associated to the desired function.
 
-**returns**: `Function` The associated function or `undefined` if no function exists.
+#### Returns:
 
-_Note_: The function provided will be bound to target Element of the original setKeyAction call.
+`Function` The associated function or `undefined` if no function exists.
+
+_Note_: The function provided will be bound to target element of the original `setKeyAction` call.
 
 ### Element.prototype.hasKeyAction(key)
 
-check if an Element has an associated function, if any, based on the given key press or key press combination
+check if an element has an associated function, if any, based on the given key press or key press combination
 
 #### Arguments:
 
 **key**: the key press or key press combination associated to the desired function.
 
-**returns**: `Boolean`
+#### Returns:
+
+`Boolean`
 
 ### Element.prototype.captureKeyAction(key,method[,target])
 
-Associate a key press or key press combination to a function for a given Element or any of it's children
+Associate a key press or key press combination to a function for a given element or any of it's children
 
-_Note_: Any Key Press combination associated to an Element with focus via `setKeyAction` will take precedence over an ancestor's `captureKeyAction` associated function. If an Element has functions set to the same Key Press combination via both `setKeyAction` and `captureKeyAction`, the `setKeyAction` will fire if the given Element has focus, but the `captureKeyAction` function will fire if a child Element has focus. If nested Elements have functions associated the same Key Press combination via `captureKeyAction`, only the most immediate (closest) ancestor to the focused Element will fire its' function.
+_Note_: Any key press combination associated to an element with focus via `setKeyAction` will take precedence over an ancestor's `captureKeyAction` associated function.
+
+If an element has functions set to the same key press combination via both `setKeyAction` and `captureKeyAction`, the `setKeyAction` will fire if the given element has focus, but the `captureKeyAction` function will fire if a child element has focus.
+
+If nested elements have functions associated the same key press combination via `captureKeyAction`, only the most immediate (closest) ancestor to the focused element will fire its' function.
 
 #### Arguments:
 
-**key**: the key press or key press combination to listen for while this Element or one of it's children has focus.
+**key**: the key press or key press combination to listen for while this element or one of it's children has focus.
 
-**method**: the function to fire when this key combination is pressed. Can be an actual function, or a string that represents the name of the Element's method to fire.
+**method**: the function to fire when this key combination is pressed. Can be an actual function, or a string that represents the name of the element's method to fire.
 
-**target**: the Element to bind to the method. Defaults to the current Element if omitted.
+**target**: the Element to bind to the method. Defaults to the current element if omitted.
 
 ### Element.prototype.releaseKeyAction(key)
 
-Stop associating a key press or key press combination to a given Element or any of it's children.
+Stop associating a key press or key press combination to a given element or any of it's children.
 
 #### Arguments:
 
@@ -128,22 +136,26 @@ Stop associating a key press or key press combination to a given Element or any 
 
 ### Element.prototype.getCaptureKeyAction(key)
 
-Return an Element's associated capture function, if any, based on the given key press or key press combination
+Return an element's associated capture function, if any, based on the given key press or key press combination
 
 #### Arguments:
 
 **key**: the key press or key press combination associated to the desired function.
 
-**returns**: `Function` The associated function or `undefined` if no function exists.
+#### Returns:
 
-_Note_: The function provided will be bound to target Element of the original capturedKeyAction call.
+`Function` The associated function or `undefined` if no function exists.
+
+_Note_: The function provided will be bound to target element of the original `capturedKeyAction` call.
 
 ### Element.prototype.hasCaptureKeyAction(key)
 
-check if an Element has an associated capture function, if any, based on the given key press or key press combination
+check if an element has an associated capture function, if any, based on the given key press or key press combination
 
 #### Arguments:
 
 **key**: the key press or key press combination associated to the desired function.
 
-**returns**: `Boolean`
+#### Returns:
+
+`Boolean`
