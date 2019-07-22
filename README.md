@@ -49,13 +49,13 @@ let panels = document.querySelectorAll('[role="tabpanel"]');
 
 ### Element.prototype.tabNext
 
-Set the element to focus on when tab is pressed.
-Value can either be an Element or a string representing the id of an Element. Will also read the id value set in a `tab-next` attribute.
+Set the element to move focus to when the `Tab` key is pressed.
+Value can either be an Element or a string representing the id of an Element. Will alternately read the id value set in a `tab-next` attribute.
 
 ### Element.prototype.tabPrevious
 
-Set the element to focus on when shift-tab is pressed.
-Value can either be an Element or a string representing the id of an Element. Will also read the id value set in a `tab-previous` attribute.
+Set the element to move focus to when the `Shift Tab` keys are pressed.
+Value can either be an Element or a string representing the id of an Element. Will alternately read the id value set in a `tab-previous` attribute.
 
 ## Methods
 
@@ -65,11 +65,10 @@ Associate a key press or key press combination to a function for a given Element
 
 #### Arguments:
 
-**key**: the key press or key press combination to listen for while this element has focus. Maps to the KeyboardEvent key value (with the exception of ' ', which becomes 'Space').
+**key**: the key press or key press combination to listen for while this element has focus. Maps to the KeyboardEvent key value (with the exception of `' '`, which becomes `Space`).
 If modifier keys are required, those should added prior to the key (e.g. `Shift ArrowUp` or `Alt Control PageDown`) in alphabetical order
 
-_Note_: for alpha-numeric keys, Shift does not need to be provided, as the key value will already detail this
-(e.g. `Shift w` will not work, but `W` will)
+_Note_: for alpha-numeric keys, Shift does not need to be provided, as the key value will already detail this (e.g. `Shift w` will not work, but `W` will)
 
 **method**: the function to fire when this key combination is pressed. Can be an actual function, or a string that represents the name of the Element's method to fire.
 
@@ -108,6 +107,8 @@ check if an Element has an associated function, if any, based on the given key p
 ### Element.prototype.captureKeyAction(key,method[,target])
 
 Associate a key press or key press combination to a function for a given Element or any of it's children
+
+_Note_: Any Key Press combination associated to an Element with focus via `setKeyAction` will take precedence over an ancestor's `captureKeyAction` associated function. If an Element has functions set to the same Key Press combination via both `setKeyAction` and `captureKeyAction`, the `setKeyAction` will fire if the given Element has focus, but the `captureKeyAction` function will fire if a child Element has focus. If nested Elements have functions associated the same Key Press combination via `captureKeyAction`, only the most immediate (closest) ancestor to the focused Element will fire its' function.
 
 #### Arguments:
 
