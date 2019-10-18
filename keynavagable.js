@@ -21,7 +21,7 @@
       },
       set: function(value) {
         var tabs = tabElements.get(this) || {};
-        if (value instanceof Element) {
+        if (value instanceof Element || typeof value === "function") {
           tabs[next] = value;
           this.removeAttribute(tabnext);
         } else if (value === String(value) && value.length) {
@@ -156,16 +156,26 @@
       }
       //tab-next set and behaviour not overriden with custom keyAction
       else if (key == "Tab" && (activeElement = activeElement.tabNext)) {
-        activeElement.focus();
-        e.preventDefault();
+        if (typeof activeElement === "function") {
+          activeElement = activeElement();
+        }
+        if (activeElement) {
+          activeElement.focus();
+          e.preventDefault();
+        }
       }
       //tab-previous set and behaviour not overriden with custom keyAction
       else if (
         key == "Shift Tab" &&
         (activeElement = activeElement.tabPrevious)
       ) {
-        activeElement.focus();
-        e.preventDefault();
+        if (typeof activeElement === "function") {
+          activeElement = activeElement();
+        }
+        if (activeElement) {
+          activeElement.focus();
+          e.preventDefault();
+        }
       } else if (captureKeys[key]) {
         //is the active Element is trying to capture this key
         myEvents = captures.get(captureElement);
@@ -176,12 +186,15 @@
             myEvents = captures.get(captureElement);
           } while (captureElement && (!myEvents || !myEvents[key]));
         }
-        if (captureElement && captureElement.dispatchEvent(getKeynavEvent())) {
+        if (
+          captureElement &&
+          captureElement.dispatchEvent(getKeynavEvent(captureElement))
+        ) {
           e.preventDefault();
           myEvents[key]();
         }
       }
-      function getKeynavEvent() {
+      function getKeynavEvent(useElement) {
         return new CustomEvent("keynavigation", {
           cancelable: true,
           bubbles: true,
@@ -191,7 +204,7 @@
             ctrlKey: e.ctrlKey,
             shiftKey: e.shiftKey,
             metaKey: e.metaKey,
-            relatedTarget: activeElement
+            relatedTarget: useElement || activeElement
           }
         });
       }

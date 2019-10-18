@@ -12,10 +12,18 @@ let tabs = document.querySelectorAll('[role="tablist"] > [role="tab"]');
 [].forEach.call(tabs, function(tab) {
   // set focus to appropriate sibling with arrow keys (assumes a focus event listener does the real work)
   tab.setKeyAction("ArrowRight", function() {
-    tab.nextElementSibling.focus();
+    let nextTab = this.nextElementSibling;
+    while (nextTab && !nextTab.matches('[role="tab"]')) {
+      nextTab = nextTab.nextElementSibling;
+    }
+    nextTab && nextTab.focus();
   });
   tab.setKeyAction("ArrowLeft", function() {
-    tab.previousElementSibling.focus();
+    let prevTab = this.previousElementSibling;
+    while (prevTab && !prevTab.matches('[role="tab"]')) {
+      prevTab = preTab.previousElementSibling;
+    }
+    prevTab && prevTab.focus();
   });
   //tab key takes you to the appropriate panel
   tab.tabNext(tab.getAttribute("aria-controls"));
@@ -33,15 +41,16 @@ let lists = document.querySelectorAll('[role="tablist"]');
   });
 });
 
-//tabpanel should be focusable
 let panels = document.querySelectorAll('[role="tabpanel"]');
 [].forEach.call(panels, function(panel) {
+  let myTab = panel.getAttribute("aria-labelledby");
   //Shift up arrow anywhere within the tab panel brings you to the tab element
   panel.captureKeyAction("Shift ArrowUp", function() {
-    document.getElementById(panel.getAttribute("aria-labelledby")).focus();
+    myTab && document.getElementById(myTab).focus();
   });
+  //tabpanel should be focusable
   //shift-tab when the panel has focus also takes you back to the tab element
-  panel.tabPrevious(panel.getAttribute("aria-labelledby"));
+  myTab && panel.tabPrevious(myTab);
 });
 ```
 
@@ -50,12 +59,16 @@ let panels = document.querySelectorAll('[role="tabpanel"]');
 ### Element.prototype.tabNext
 
 Set the element to move focus to when the `Tab` key is pressed.
-Value can either be an element or a string representing the id of an element. Will alternately read the id value set in a `tab-next` attribute.
+Value can either be an Element, a function, or a string representing the id of an element. Will alternately read the id value set in a `tab-next` attribute.
+
+If tabNext is set to a function, it must either return an element or null. If null is returned, the default tab order will occur.
 
 ### Element.prototype.tabPrevious
 
 Set the element to move focus to when the `Shift Tab` keys are pressed.
-Value can either be an element or a string representing the id of an element. Will alternately read the id value set in a `tab-previous` attribute.
+Value can either be an Element, a function, or a string representing the id of an element. Will alternately read the id value set in a `tab-previous` attribute.
+
+If tabPrevious is set to a function, it must either return an Element or null. If null is returned, the default tab order will occur.
 
 ## Methods
 
@@ -65,8 +78,8 @@ Associate a key press or key press combination to a function for a given element
 
 #### Arguments:
 
-**key**: the key press or key press combination to listen for while this element has focus. Maps to the KeyboardEvent key value (with the exception of `' '`, which becomes `Space`).
-If modifier keys are required, those should added prior to the key (e.g. `Shift ArrowUp` or `Alt Control PageDown`) in alphabetical order
+**key**: the key press or key press combination to listen for while this element has focus. Maps to the [KeyboardEvent key](https://github.com/cvan/keyboardevent-key-polyfill) value (with the exception of `' '`, which becomes `Space`).
+If modifier keys are required, those need to be added prior to the key (e.g. `Shift ArrowUp` or `Alt Control PageDown`) in alphabetical order
 
 _Note_: for alpha-numeric keys, Shift does not need to be provided, as the key value will already detail this (e.g. `Shift w` will not work, but `W` will)
 
