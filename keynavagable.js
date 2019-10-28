@@ -1,138 +1,153 @@
-!(function() {
+!(function(view) {
   //assumes WeakMap is polyfilled
   var events = new WeakMap();
   var captures = new WeakMap();
   var tabElements = new WeakMap();
   var captureKeys = {};
-  var ep = Element.prototype;
   var next = "next",
-    tabnext = "tab-next",
+    tabnext = "aria-flowto", //aria standard tab order controller
     prev = "prev",
-    tabprev = "tab-previous";
-  Object.defineProperties(ep, {
-    tabNext: {
-      get: function() {
-        var tabs = tabElements.get(this);
-        if (tabs && tabs[next]) {
-          return tabs[next];
-        } else {
-          return document.getElementById(this.getAttribute(tabnext));
-        }
-      },
-      set: function(value) {
-        var tabs = tabElements.get(this) || {};
-        if (value instanceof Element || typeof value === "function") {
-          tabs[next] = value;
-          this.removeAttribute(tabnext);
-        } else if (value === String(value) && value.length) {
-          tabs[next] = null;
-          this.setAttribute(tabnext, value);
-        } else {
-          tabs[next] = null;
-          this.removeAttribute(tabnext);
-        }
-        tabElements.set(this, tabs);
-      },
-      enumerable: true,
-      configurable: true
+    tabprev = "x-ms-aria-flowfrom"; //non-standard MS extension to aria
+    //https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/x-ms-aria-flowfrom
+
+  view.KeyNavigable = {
+    getTabNext: function(element) {
+      var tabs = tabElements.get(element);
+      if (tabs && tabs[next]) {
+        return tabs[next];
+      } else {
+        return document.getElementById(this.getAttribute(tabnext));
+      }
     },
-    tabPrevious: {
-      get: function() {
-        var tabs = tabElements.get(this);
-        if (tabs && tabs[prev]) {
-          return tabs[prev];
-        } else {
-          return document.getElementById(this.getAttribute(tabprev));
+    setTabNext: function(element,value) {
+      var tabs = tabElements.get(element) || {};
+      if (value instanceof Element || value instanceof Function) {
+        tabs[next] = value;
+        element.removeAttribute(tabnext);
+        // if the value is an Element with an id, set flowto attribute so it can implicitly get tabPrevious set
+        value instanceof Element && value.id && element.setAttribute(tabnext,value.id);
+      } else if (value === String(value) && value.length) {
+        tabs[next] = null;
+        element.setAttribute(tabnext, value);
+      } else {
+        tabs[next] = null;
+        element.removeAttribute(tabnext);
+      }
+      tabElements.set(element, tabs);
+      return window.KeyNavigable;
+    },
+    getTabPrevious: function(element) {
+      var tabs = tabElements.get(element);
+      if (tabs && tabs[prev]) {
+        return tabs[prev];
+      } else {
+        var attrId = elmementId.getAttribute(tabprev);
+        // the non-standard flowfrom attribute exists, use it to do the lookup
+        if (attrId) {
+          return document.getElementById(attrId);
         }
-      },
-      set: function(value) {
-        var tabs = tabElements.get(this) || {};
-        if (value instanceof Element) {
-          tabs[prev] = value;
-          this.removeAttribute(tabprev);
-        } else if (value === String(value) && value.length) {
-          tabs[prev] = null;
-          this.setAttribute(tabprev, value);
-        } else {
-          tabs[prev] = null;
-          this.removeAttribute(tabprev);
+        // otherwise do a reverse lookup for an Element that points to this via flowto
+        else if (element.id) {
+          return document.querySelector('[' + tabnext + '="' + element.id + '"]');
         }
-        tabElements.set(this, tabs);
-      },
-      enumerable: true,
-      configurable: true
+        return null;
+      }
+    },
+    setTabPrevious: function(element, target) {
+      var tabs = tabElements.get(element) || {};
+      if (target instanceof Element || target instanceof Function) {
+        tabs[prev] = target;
+        element.removeAttribute(tabprev);
+        if (target instanceof Element && target.id) {
+          //use the non-standard attribute.
+          element.setAttribute(tabprev,target.id);
+        }
+      } else if (target === String(target) && target.length) {
+        tabs[prev] = null;
+        element.setAttribute(tabprev, target);
+      } else {
+        tabs[prev] = null;
+        element.removeAttribute(tabprev);
+      }
+      tabElements.set(element, tabs);
+      return window.KeyNavigable;
+    },
+    hasKeyAction: function hasKeyAction(element,key) {
+      return !!(events.get(element) || {})[key];
+    },
+    getKeyAction: function getKeyAction(element,key) {
+      return (events.get(element) || {})[key];
+    },
+    setKeyAction: function setKeyAction(element, key, method, target) {
+      var myEvents = events.get(element) || {};
+      //if target not passed in, use element
+      target = target instanceof Element ? target : element;
+      //if method is a string matching a method of the target, use that.
+      if (
+        method &&
+        method === "" + method &&
+        target[method] instanceof Function
+      ) {
+        method = element[method];
+      }
+      //if it's not a function, use a dummy method so we throw errors
+      else if (!(method instanceof Function)) {
+        method = function() {console.lig(key + " KeyAction fired for " + element)};
+      }
+      myEvents[key] = method.bind(target);
+      events.set(element, myEvents);
+
+      return window.KeyNavigable;
+    },
+    removeKeyAction: function removeKeyAction(element,key) {
+      var myEvents = events.get(element);
+      if (myEvents && myEvents[key]) {
+        delete myEvents[key];
+        Object.keys(myEvents).length
+          ? events.set(element, myEvents)
+          : events.delete(element);
+      }
+      return window.KeyNavigable;
+    },
+    hasCaptureKeyAction: function hasCaptureKeyAction(element,key) {
+      return !!(captures.get(element) || {})[key];
+    },
+    getCaptureKeyAction: function getCaptureKeyAction(element,key) {
+      return (captures.get(element) || {})[key];
+    },
+    captureKeyAction: function captureKeyAction(element, key, method, target) {
+      var myCaptures = captures.get(element) || {};
+      if (!myCaptures[key]) {
+        captureKeys[key] ? captureKeys[key]++ : (captureKeys[key] = 1);
+      }
+      target = target instanceof Element ? target : element;
+      if (
+        method &&
+        method === "" + method &&
+        element[method] instanceof Function
+      ) {
+        method = element[method];
+      } else if (!(method instanceof Function)) {
+        method = function() {console.log(key + " KeyCapture fired for " + element)};
+      }
+      myCaptures[key] = method.bind(element);
+      captures.set(element, myCaptures);
+      return window.KeyNavigable;
+    },
+    releaseKeyAction: function releaseKeyEvent(element,key) {
+      var myCaptures = captures.get(element);
+      if (myCaptures && myCaptures[key]) {
+        delete myCaptures[key];
+        captureKeys[key]--;
+        Object.keys(myCaptures).length
+          ? captures.set(element, myCaptures)
+          : captures.delete(element);
+      }
+      return window.KeyNavigable;
     }
-  });
-  ep.hasKeyAction = function hasKeyAction(key) {
-    return !!(events.get(this) || {})[key];
-  };
-  ep.getKeyAction = function getKeyAction(key) {
-    return (events.get(this) || {})[key];
-  };
-  ep.setKeyAction = function setKeyAction(key, method, element) {
-    var myEvents = events.get(this) || {};
-    element = element instanceof Element ? element : this;
-    //if method is a string matching a method of the element, use that.
-    if (
-      method &&
-      method === "" + method &&
-      element[method] instanceof Function
-    ) {
-      method = element[method];
-    }
-    //if it's not a function, use a dummy.
-    else if (!(typeof method === "function")) {
-      method = function() {};
-    }
-    if (method) {
-      myEvents[key] = method.bind(element);
-      events.set(this, myEvents);
-    }
-  };
-  ep.removeKeyAction = function removeKeyAction(key) {
-    var myEvents = events.get(this);
-    if (myEvents && myEvents[key]) {
-      delete myEvents[key];
-      Object.keys(myEvents).length
-        ? events.set(this, myEvents)
-        : events.delete(this);
-    }
-  };
-  ep.hasCaptureKeyAction = function hasCaptureKeyAction(key) {
-    return !!(captures.get(this) || {})[key];
-  };
-  ep.getCaptureKeyAction = function getCaptureKeyAction(key) {
-    return (captures.get(this) || {})[key];
-  };
-  ep.captureKeyAction = function captureKeyAction(key, method, element) {
-    var myCaptures = captures.get(this) || {};
-    if (!myCaptures[key]) {
-      captureKeys[key] ? captureKeys[key]++ : (captureKeys[key] = 1);
-    }
-    element = element instanceof Element ? element : this;
-    if (
-      method &&
-      method === "" + method &&
-      element[method] instanceof Function
-    ) {
-      method = element[method];
-    } else if (!(method instanceof Function)) {
-      method = function() {};
-    }
-    myCaptures[key] = method.bind(element);
-    captures.set(this, myCaptures);
-  };
-  ep.releaseKeyAction = function releaseKeyEvent(key) {
-    var myCaptures = captures.get(this);
-    if (myCaptures && myCaptures[this]) {
-      delete myCaptures[this];
-      captureKeys[key]--;
-      Object.keys(myCaptures).length
-        ? captures.set(this, myCaptures)
-        : captures.delete(this);
-    }
-  };
-  document.addEventListener(
+  }
+  //make sure there's a document to add a listener to.
+  view.document && document.addEventListener(
     "keydown",
     function onDocumentKeydown(e) {
       //assumes key is polyfilled https://github.com/cvan/keyboardevent-key-polyfill
@@ -155,11 +170,11 @@
         }
       }
       //tab-next set and behaviour not overriden with custom keyAction
-      else if (key == "Tab" && (activeElement = activeElement.tabNext)) {
+      else if (key == "Tab" && (activeElement = KeyNaviagable.getTabNext(activeElement))) {
         if (typeof activeElement === "function") {
           activeElement = activeElement();
         }
-        if (activeElement) {
+        if (activeElement instanceof Element) {
           activeElement.focus();
           e.preventDefault();
         }
@@ -167,12 +182,12 @@
       //tab-previous set and behaviour not overriden with custom keyAction
       else if (
         key == "Shift Tab" &&
-        (activeElement = activeElement.tabPrevious)
+        (activeElement = KeyNaviagable.getTabPrevious(activeElement))
       ) {
         if (typeof activeElement === "function") {
           activeElement = activeElement();
         }
-        if (activeElement) {
+        if (activeElement instanceof Element) {
           activeElement.focus();
           e.preventDefault();
         }
@@ -211,4 +226,4 @@
     },
     true
   );
-})();
+})(self);

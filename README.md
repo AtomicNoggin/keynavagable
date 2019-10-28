@@ -1,8 +1,7 @@
 # keynavagable
 
-Lightweight keyboard navigation manager. Extends the Element object to allow
-custom key navigation events to be set on focusable elements, or capture
-key navigation events of child focusable elements.
+Lightweight keyboard navigation manager to allow custom key navigation events 
+to be set on focusable elements, or capture key navigation events of child focusable elements.
 
 ## Usage
 
@@ -11,72 +10,132 @@ key navigation events of child focusable elements.
 let tabs = document.querySelectorAll('[role="tablist"] > [role="tab"]');
 [].forEach.call(tabs, function(tab) {
   // set focus to appropriate sibling with arrow keys (assumes a focus event listener does the real work)
-  tab.setKeyAction("ArrowRight", function() {
-    let nextTab = this.nextElementSibling;
-    while (nextTab && !nextTab.matches('[role="tab"]')) {
-      nextTab = nextTab.nextElementSibling;
-    }
-    nextTab && nextTab.focus();
-  });
-  tab.setKeyAction("ArrowLeft", function() {
-    let prevTab = this.previousElementSibling;
-    while (prevTab && !prevTab.matches('[role="tab"]')) {
-      prevTab = preTab.previousElementSibling;
-    }
-    prevTab && prevTab.focus();
-  });
-  //tab key takes you to the appropriate panel
-  tab.tabNext(tab.getAttribute("aria-controls"));
+  KeyNabigable
+    .setKeyAction(tab,"ArrowRight", function() {
+      let nextTab = this.nextElementSibling;
+      while (nextTab && !nextTab.matches('[role="tab"]')) {
+        nextTab = nextTab.nextElementSibling;
+      }
+      nextTab && nextTab.focus();
+    })
+    .setKeyAction(tab, "ArrowLeft", function() {
+      let prevTab = this.previousElementSibling;
+      while (prevTab && !prevTab.matches('[role="tab"]')) {
+        prevTab = preTab.previousElementSibling;
+      }
+      prevTab && prevTab.focus();
+    })
+    //if tabpanel is focusable, the tab key should takes you to it
+    .setTabNext(tab,tab.getAttribute("aria-controls"));
+    // NOTE: setting aria-flowto on the tab will implicitly make this connection as well.
 });
 
 // tablist does not need to be focusable to capture a key action
 let lists = document.querySelectorAll('[role="tablist"]');
 [].forEach.call(lists, function(list) {
   // if child element has focus move to top or bottom of list on Home/End
-  list.captureKeyAction("Home", function() {
-    list.firstElementChild.focus();
-  });
-  list.captureKeyAction("End", function() {
-    list.lastElementChild.focus();
-  });
+  KeyNavigable
+    .captureKeyAction(list, "Home", function() {
+      list.firstElementChild.focus();
+    })
+    .captureKeyAction("End", function() {
+      list.lastElementChild.focus();
+    });
 });
 
 let panels = document.querySelectorAll('[role="tabpanel"]');
 [].forEach.call(panels, function(panel) {
-  let myTab = panel.getAttribute("aria-labelledby");
   //Shift up arrow anywhere within the tab panel brings you to the tab element
-  panel.captureKeyAction("Shift ArrowUp", function() {
+  KeyNavigable.captureKeyAction(panel,"Shift ArrowUp", function() {
     myTab && document.getElementById(myTab).focus();
   });
-  //tabpanel should be focusable
-  //shift-tab when the panel has focus also takes you back to the tab element
-  myTab && panel.tabPrevious(myTab);
+  //if tabpanel is focasable, shift-tab return to the tab element
+  let myTab = panel.getAttribute("aria-labelledby");
+  myTab && KeyNavigable.setTabPrevious(panel,myTab);
+  // NOTE: setting aria-flowto on the tab will implicitly make this connection as well.
 });
 ```
 
-## Properties
+## Methods
 
-### Element.prototype.tabNext
+### KeyNavigable.setTabNext(element, target)
 
-Set the element to move focus to when the `Tab` key is pressed.
-Value can either be an Element, a function, or a string representing the id of an element. Will alternately read the id value set in a `tab-next` attribute.
+Set an element's alternate target to move focus to when the `Tab` key is pressed.
 
-If tabNext is set to a function, it must either return an element or null. If null is returned, the default tab order will occur.
+#### Arguments:
 
-### Element.prototype.tabPrevious
+**element**: the element to costomize tab order for.
 
-Set the element to move focus to when the `Shift Tab` keys are pressed.
-Value can either be an Element, a function, or a string representing the id of an element. Will alternately read the id value set in a `tab-previous` attribute.
+**target**: the element to `Tab` to, or method for finding it. It can either be an Element, a string representing the id of an element, or a function. 
+
+If target is set to a function, it must either return an element or null. If null is returned, the default tab order will occur.
+
+Otherwise, If target is a string or an element with an id, the target's setTabPrevious will also implicetly be set by virtue of having this element's `aria-flowto` being set.
+
+### KeyNavigable.getTabNext(element)
+
+Lookup an elements target, if any, that will recieve focus if `Tab` is pressed.
+
+#### Arguments ####
+
+**element** The element who's target you are looking for
+
+**returns** one of 
+  - the target set for `element` by setTabNext, either directly or by id reference,
+  - the function set for `element` by setTabNext,
+  - the Element who's id value is set in `element`'s `aria-flowto` attribute.
+  - `null` if none of the above criteria are set
+
+#### Arguments:
+
+**element**: the element to move focus from.
+
+This method is used internally
+
+### KeyNavigable.setTabPrevious(element, value)
+
+Set an element's alternate target to move focus to when the `Shift Tab` key is pressed.
+
+#### Arguments:
+
+**element**: the element to costomize tab order for.
+
+**target**: the element to `Shift Tab` to, or method for finding it. It can either be an Element, a string representing the id of an element, or a function. 
+
+If target is set to a function, it must either return an element or null. If null is returned, the default tab order will occur.
+
+### KeyNavigable.getTabPrevious(element)
+
+Lookup an elements target, if any, that will recieve focus if `Shift Tab` is pressed.
+
+#### Arguments ####
+
+**element** The element who's target you are looking for
+
+**returns** one of 
+  - the target set for `element` by setTabPrevious, either directly or by id reference,
+  - the function set for `element` by setTabPrevious,
+  - the Element who's id value is set in `element`'s `x-ms-aria-flowfrom` attribute.
+  - the Element who's  `aria-flowto` attribute matches the `element`'s id.
+  - `null` if none of the above criteria are set
+
+#### Arguments:
+
+**element**: the element to costomize tab order for.
+
+**value**: can either be an Element,  a string representing the id of an element, or a function. 
+
+Value can either be an Element, a function, or a string representing the id of an element. Will alternately read the id value set in a `x-ms-aria-flowfrom` attribute
+or find an element whose `aria-flowto` arttribute points to the activewElement.
 
 If tabPrevious is set to a function, it must either return an Element or null. If null is returned, the default tab order will occur.
 
-## Methods
-
-### Element.prototype.setKeyAction(key,method[,target])
+### KeyNavigable.setKeyAction(element,key,method[,target])
 
 Associate a key press or key press combination to a function for a given element.
 
 #### Arguments:
+**element**: the element to attach the key action to
 
 **key**: the key press or key press combination to listen for while this element has focus. Maps to the [KeyboardEvent key](https://github.com/cvan/keyboardevent-key-polyfill) value (with the exception of `' '`, which becomes `Space`).
 If modifier keys are required, those need to be added prior to the key (e.g. `Shift ArrowUp` or `Alt Control PageDown`) in alphabetical order
@@ -85,17 +144,19 @@ _Note_: for alpha-numeric keys, Shift does not need to be provided, as the key v
 
 **method**: the function to fire when this key combination is pressed. Can be an actual function, or a string that represents the name of the Element's method to fire.
 
-**target**: the Element to bind the method to. Defaults to the current Element if omitted.
+**target**: (optional) the Element to bind the method to. Defaults to the current Element if omitted.
 
-### Element.prototype.removeKeyAction(key)
+### KeyNavigable.removeKeyAction(element, key)
 
 Stop associating a key press or key press combination to an element
 
 #### Arguments:
 
+**element**: the element to remove the key action from
+
 **key**: the key press or key press combination to stop listening for.
 
-### Element.prototype.getKeyAction(key)
+### KeyNavigable.getKeyAction(key)
 
 return an element's associated function, if any, based on the given key press or key press combination
 
@@ -109,7 +170,7 @@ return an element's associated function, if any, based on the given key press or
 
 _Note_: The function provided will be bound to target element of the original `setKeyAction` call.
 
-### Element.prototype.hasKeyAction(key)
+### KeyNavigable.hasKeyAction(key)
 
 check if an element has an associated function, if any, based on the given key press or key press combination
 
@@ -121,7 +182,7 @@ check if an element has an associated function, if any, based on the given key p
 
 `Boolean`
 
-### Element.prototype.captureKeyAction(key,method[,target])
+### KeyNavigable.captureKeyAction(key,method[,target])
 
 Associate a key press or key press combination to a function for a given element or any of it's children
 
@@ -139,7 +200,7 @@ If nested elements have functions associated the same key press combination via 
 
 **target**: the Element to bind to the method. Defaults to the current element if omitted.
 
-### Element.prototype.releaseKeyAction(key)
+### KeyNavigable.releaseKeyAction(key)
 
 Stop associating a key press or key press combination to a given element or any of it's children.
 
@@ -147,7 +208,7 @@ Stop associating a key press or key press combination to a given element or any 
 
 **key**: the key press or key press combination to stop listening for on behalf of this elements children
 
-### Element.prototype.getCaptureKeyAction(key)
+### KeyNavigable.getCaptureKeyAction(key)
 
 Return an element's associated capture function, if any, based on the given key press or key press combination
 
@@ -161,7 +222,7 @@ Return an element's associated capture function, if any, based on the given key 
 
 _Note_: The function provided will be bound to target element of the original `capturedKeyAction` call.
 
-### Element.prototype.hasCaptureKeyAction(key)
+### KeyNavigable.hasCaptureKeyAction(key)
 
 check if an element has an associated capture function, if any, based on the given key press or key press combination
 
