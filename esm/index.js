@@ -19,7 +19,7 @@ const KeyNavagable = {
             return tabs[next];
         } else {
             // make sure we have a document to query
-            return self.document && document.getElementById(this.getAttribute(tabnext));
+            return self.document && document.getElementById(telement.getAttribute(tabnext));
         }
     },
     setTabNext(element,target) {
