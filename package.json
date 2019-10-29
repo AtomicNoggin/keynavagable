@@ -1,0 +1,33 @@
+{
+  "name": "keynagabable",
+  "version": "2.0.0",
+  "description": "Centrelized keyboad navigation",
+  "module": "esm/index.js",
+  "unpkg": "min.js",
+  "scripts": {
+    "build": "npm run min",
+    "min": "uglifyjs keynavagable.js --support-ie8 -c -m > keynavagable.min.js"
+  },
+  "author": "Patrick Denny",
+  "license": "Apache 2.0",
+  "devDependencies": {
+    "uglify-js": "^3.5.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AtomicNoggin/keynavagable.git"
+  },
+  "keywords": [
+    "keyboard",
+    "navigation",
+    "ally",
+    "accessability"
+  ],
+  "bugs": {
+    "url": "https://github.com/AtomicNoggin/keyanvagable/issues"
+  },
+  "homepage": "https://github.com/AtomicNoggin/keynavagable#readme",
+  "dependencies": {
+    "keyboardevent-key-polyfill": "^1.1.0"
+  }
+}
