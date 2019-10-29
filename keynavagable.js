@@ -170,7 +170,7 @@
         }
       }
       //tab-next set and behaviour not overriden with custom keyAction
-      else if (key == "Tab" && (activeElement = KeyNaviagable.getTabNext(activeElement))) {
+      else if (key == "Tab" && (activeElement = KeyNavagable.getTabNext(activeElement))) {
         if (typeof activeElement === "function") {
           activeElement = activeElement();
         }
@@ -182,7 +182,7 @@
       //tab-previous set and behaviour not overriden with custom keyAction
       else if (
         key == "Shift Tab" &&
-        (activeElement = KeyNaviagable.getTabPrevious(activeElement))
+        (activeElement = KeyNavagable.getTabPrevious(activeElement))
       ) {
         if (typeof activeElement === "function") {
           activeElement = activeElement();
