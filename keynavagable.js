@@ -10,7 +10,7 @@
     tabprev = "x-ms-aria-flowfrom"; //non-standard MS extension to aria
     //https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques/x-ms-aria-flowfrom
 
-  view.KeyNavigable = {
+  view.KeyNavagable = {
     getTabNext: function(element) {
       var tabs = tabElements.get(element);
       if (tabs && tabs[next]) {
@@ -34,7 +34,7 @@
         element.removeAttribute(tabnext);
       }
       tabElements.set(element, tabs);
-      return window.KeyNavigable;
+      return window.KeyNavagable;
     },
     getTabPrevious: function(element) {
       var tabs = tabElements.get(element);
@@ -70,7 +70,7 @@
         element.removeAttribute(tabprev);
       }
       tabElements.set(element, tabs);
-      return window.KeyNavigable;
+      return window.KeyNavagable;
     },
     hasKeyAction: function hasKeyAction(element,key) {
       return !!(events.get(element) || {})[key];
@@ -97,7 +97,7 @@
       myEvents[key] = method.bind(target);
       events.set(element, myEvents);
 
-      return window.KeyNavigable;
+      return window.KeyNavagable;
     },
     removeKeyAction: function removeKeyAction(element,key) {
       var myEvents = events.get(element);
@@ -107,7 +107,7 @@
           ? events.set(element, myEvents)
           : events.delete(element);
       }
-      return window.KeyNavigable;
+      return window.KeyNavagable;
     },
     hasCaptureKeyAction: function hasCaptureKeyAction(element,key) {
       return !!(captures.get(element) || {})[key];
@@ -132,7 +132,7 @@
       }
       myCaptures[key] = method.bind(element);
       captures.set(element, myCaptures);
-      return window.KeyNavigable;
+      return window.KeyNavagable;
     },
     releaseKeyAction: function releaseKeyEvent(element,key) {
       var myCaptures = captures.get(element);
@@ -143,7 +143,7 @@
           ? captures.set(element, myCaptures)
           : captures.delete(element);
       }
-      return window.KeyNavigable;
+      return window.KeyNavagable;
     }
   }
   //make sure there's a document to add a listener to.

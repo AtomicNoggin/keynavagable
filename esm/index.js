@@ -12,7 +12,7 @@ const next = "next",
   
 KeyboardEvent.polyfill();
 
-const KeyNavigable = {
+const KeyNavagable = {
     getTabNext(element) {
         const tabs = tabElements.get(element);
         if (tabs && tabs[next]) {
@@ -40,7 +40,7 @@ const KeyNavigable = {
         }
         tabElements.set(element, tabs);
         // allow chaining.
-        return KeyNavigable;
+        return KeyNavagable;
     },
     getTabPrevious(element) {
         const tabs = tabElements.get(element);
@@ -76,7 +76,7 @@ const KeyNavigable = {
             element.removeAttribute(tabprev);
         }
         tabElements.set(element, tabs);
-        return KeyNavigable;
+        return KeyNavagable;
     },
     hasKeyAction(element,key) {
         return !!(events.get(element) || {})[key];
@@ -103,7 +103,7 @@ const KeyNavigable = {
         myEvents[key] = method.bind(target);
         events.set(element, myEvents);
 
-        return KeyNavigable;
+        return KeyNavagable;
     },
     removeKeyAction(element,key) {
         const myEvents = events.get(element);
@@ -113,7 +113,7 @@ const KeyNavigable = {
             ? events.set(element, myEvents)
             : events.delete(element);
         }
-        return KeyNavigable;
+        return KeyNavagable;
     },
     hasCaptureKeyAction(element,key) {
         return !!(captures.get(element) || {})[key];
@@ -138,7 +138,7 @@ const KeyNavigable = {
         }
         myCaptures[key] = method.bind(element);
         captures.set(element, myCaptures);
-        return KeyNavigable;
+        return KeyNavagable;
     },
     releaseKeyAction(element,key) {
         const myCaptures = captures.get(element);
@@ -149,10 +149,10 @@ const KeyNavigable = {
             ? captures.set(element, myCaptures)
             : captures.delete(element);
         }
-        return KeyNavigable;
+        return KeyNavagable;
     }
 }
-export default KeyNavigable;
+export default KeyNavagable;
 
 //make sure there's a document to add a listener to.
 self.document && document.addEventListener(
