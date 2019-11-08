@@ -1,6 +1,6 @@
 {
   "name": "keynavagable",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Centrelized keyboad navigation",
   "module": "esm/index.js",
   "unpkg": "min.js",
