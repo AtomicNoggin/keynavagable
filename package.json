@@ -1,16 +1,18 @@
 {
   "name": "keynavagable",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Centralized keyboad navigation",
   "module": "esm/index.js",
+  "main": "cjs/index.js",
   "unpkg": "min.js",
   "scripts": {
-    "build": "npm run min",
+    "build": "ascjs esm cjs && npm run min",
     "min": "uglifyjs keynavagable.js --support-ie8 -c -m > keynavagable.min.js"
   },
   "author": "Patrick Denny",
   "license": "Apache-2.0",
   "devDependencies": {
+    "ascjs": "^3.1.2",
     "uglify-js": "^3.5.9"
   },
   "repository": {
