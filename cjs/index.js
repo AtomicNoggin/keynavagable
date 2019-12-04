@@ -28,14 +28,14 @@ const KeyNavagable = {
   setTabNext(element, target) {
     const tabs = tabElements.get(element) || {};
     if (target instanceof Element || target instanceof Function) {
-      tabs[next] = value;
+      tabs[next] = target;
       element.removeAttribute(tabnext);
       // if the target is an Element with an id, set flowto attribute so target can implicitly get tabPrevious set
       target instanceof Element &&
         target.id &&
         element.setAttribute(tabnext, target.id);
     } else if (target === String(target) && target.length) {
-      tabs[next] = null;
+      tabs[next] = target;
       // no need to save theelement, just set flowto
       element.setAttribute(tabnext, target);
     } else {
