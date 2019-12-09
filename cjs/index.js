@@ -107,7 +107,7 @@ const KeyNavagable = {
     //if it's not a function, use a dummy method so we don't throw errors
     else if (!(method instanceof Function)) {
       method = function() {
-        console.lig(key + " KeyAction fired for " + element);
+        console.log(key + " KeyAction fired for " + element);
       };
     }
     myEvents[key] = method.bind(target);
