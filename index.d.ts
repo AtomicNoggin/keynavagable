@@ -1,34 +1,35 @@
 declare module "keynavagable" {
-  interface KeyNavagable {
-    getTabNext(element: Element): () => (void) | Element;
+  type method = () => void;
+  interface IKeyNavagable {
+    getTabNext(element: Element): method | Element;
     setTabNext(
       element: Element,
-      target?: () => (void) | string | Element
-    ): KeyNavagable;
-    getTabPrevious(element: Element): () => (void) | Element;
+      target?: method | string | Element
+    ): IKeyNavagable;
+    getTabPrevious(element: Element): method | Element;
     setTabPrevious(
       element: Element,
-      target?: () => void | string | Element
-    ): KeyNavagable;
+      target?: method | string | Element
+    ): IKeyNavagable;
     hasKeyAction(element: Element, key: string): boolean;
-    getKeyAction(element: Element, key: string): () => void | null;
+    getKeyAction(element: Element, key: string): method | null;
     setKeyAction(
       element: Element,
       key: string,
-      method: () => void | string,
-      target?: () => void | string | Element
-    ): KeyNavagable;
-    removeKeyAction(element: Element, key: string): KeyNavagable;
+      method: method | string,
+      target?: method | string | Element
+    ): IKeyNavagable;
+    removeKeyAction(element: Element, key: string): IKeyNavagable;
     hasCaptureKeyAction(element: Element, key: string): boolean;
-    getCaptureKeyAction(element: Element, key: string): () => (void) | null;
+    getCaptureKeyAction(element: Element, key: string): method | null;
     captureKeyAction(
       element: Element,
       key: string,
-      method: () => void | string,
-      target?: () => void | string | Element
-    ): KeyNavagable;
-    releaseKeyAction(element: Element, key: string): KeyNavagable;
+      method: method | string,
+      target?: method | string | Element
+    ): IKeyNavagable;
+    releaseKeyAction(element: Element, key: string): IKeyNavagable;
   }
-  export const KeyNavagable: KeyNavagable;
+  export const KeyNavagable: IKeyNavagable;
   export default KeyNavagable;
 }
